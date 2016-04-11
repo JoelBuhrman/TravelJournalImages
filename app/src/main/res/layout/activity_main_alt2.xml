@@ -1,0 +1,185 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/mainLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fff"
+    android:clickable="true">
+
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/alcatraz" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/defaultTextPaddingImage">
+
+        <TextView
+            android:id="@+id/chosen_image_date"
+            style="@style/ImageText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="showOtherOption"
+            android:text="24 Aug 2015"
+
+            />
+
+        <TextView
+            android:id="@+id/cityName"
+            style="@style/ImageText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="startNext"
+            android:text="San Francisco" />
+
+    </LinearLayout>
+
+
+    <com.getbase.floatingactionbutton.FloatingActionsMenu
+        android:id="@+id/multiple_actions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/linearLayout"
+        android:layout_alignParentRight="true"
+        fab:fab_addButtonColorNormal="#fff"
+        fab:fab_addButtonColorPressed="#fff"
+        fab:fab_addButtonPlusIconColor="#000"
+
+
+        >
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/action_a"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_colorNormal="#fff"
+            fab:fab_colorPressed="#fff"
+            fab:fab_icon="@drawable/vector_drawable_ic_mode_edit_black___px"
+
+            fab:fab_size="mini"
+
+            >
+
+
+        </com.getbase.floatingactionbutton.FloatingActionButton>
+
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/action_c"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_colorNormal="#fff"
+            fab:fab_colorPressed="#fff"
+            fab:fab_icon="@drawable/vector_drawable_ic_save_black___px"
+            fab:fab_size="mini"></com.getbase.floatingactionbutton.FloatingActionButton>
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/action_d"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_colorNormal="#ef4242"
+            fab:fab_colorPressed="#ef4242"
+            fab:fab_icon="@drawable/vector_drawable_ic_delete_black___px"
+            fab:fab_size="mini"></com.getbase.floatingactionbutton.FloatingActionButton>
+    </com.getbase.floatingactionbutton.FloatingActionsMenu>
+
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/relativeLayout"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <!-- <ImageView
+             android:id="@+id/arrow"
+             android:layout_width="48dp"
+             android:layout_height="24dp"
+             android:scaleType="fitXY"
+
+             ></ImageView>
+
+
+         <TextView
+             android:id="@+id/description"
+             style="@style/ImageTextThin"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             />-->
+
+    </LinearLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_alignParentBottom="true"
+        android:animateLayoutChanges="true"
+        android:background="#80000000">
+
+        <RelativeLayout
+            android:id="@+id/relativeLayout1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true">
+
+            <ImageButton
+                android:id="@+id/mic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:background="@null"
+                android:src="@drawable/vector_drawable_ic_mic_black___px" />
+
+            <ImageButton
+                android:id="@+id/info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_toLeftOf="@+id/hide"
+                android:background="@null"
+                android:src="@drawable/vector_drawable_ic_info_outline_white___px" />
+
+
+            <TextView
+                android:id="@+id/hide"
+                style="@style/ImageText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:paddingRight="16dp"
+                android:layout_marginLeft="16dp"
+                android:paddingTop="16dp"
+                android:text="Hide" />
+        </RelativeLayout>
+
+
+        <EditText
+            android:id="@+id/editText"
+            style="@style/DescriptionText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/relativeLayout1"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:background="#00000000"
+            android:hint="Add your description here"
+            android:imeOptions="actionDone"
+            android:textColorHint="#fff"
+            android:textCursorDrawable="@null"
+
+            />
+
+
+    </RelativeLayout>
+
+
+</RelativeLayout>

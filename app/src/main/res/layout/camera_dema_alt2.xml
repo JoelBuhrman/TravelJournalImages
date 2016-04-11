@@ -1,0 +1,80 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    >
+
+
+    <RelativeLayout
+        android:id="@+id/btn_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <SurfaceView
+            android:id="@+id/surfaceView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+
+            />
+
+
+        <RelativeLayout
+            android:id="@+id/layout_area1"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_alignParentBottom="true"
+            android:paddingBottom="16dp"
+            android:gravity="center_vertical">
+
+
+
+            <com.melnykov.fab.FloatingActionButton
+                android:id="@+id/btn_take_photo"
+                android:alpha="0.7"
+                android:padding="8dp"
+                android:scaleType="fitXY"
+                app:rippleColor="@null"
+                android:background="@null"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+
+                fab:fab_type="normal"
+                fab:fab_colorNormal="#fff"
+                fab:fab_colorPressed="#fff"
+                fab:fab_shadow="true"
+
+                />
+
+
+            <ImageView
+                android:src="@drawable/vector_drawable_ic_swap_horiz_black___px"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="15dp"
+
+                />
+            <ImageView
+                android:id="@+id/flip_icon"
+                android:src="@drawable/vector_drawable_ic_swap_horiz_white___px"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="16dp"
+
+
+                />
+
+
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+</RelativeLayout>
