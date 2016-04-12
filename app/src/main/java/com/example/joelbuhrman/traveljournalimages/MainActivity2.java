@@ -14,6 +14,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.speech.RecognizerIntent;
 import android.support.v4.app.ActivityCompat;
 import android.view.View;
@@ -71,35 +72,16 @@ public class MainActivity2 extends Activity {
 
         init();
         setOnClickListeners();
-        setOnSwipeListeners();
 
 
     }
 
-    private void setOnSwipeListeners() {
-        image.setOnTouchListener(new OnSwipeTouchListener(MainActivity2.this) {
-            public void onSwipeTop() {
-                performExpandOrCollapse();
-                Toast.makeText(getApplicationContext(), "image up", Toast.LENGTH_SHORT).show();
-            }
-
-            public void onSwipeBottom() {
-                performExpandOrCollapse();
-                Toast.makeText(getApplicationContext(), "image down", Toast.LENGTH_SHORT).show();
-            }
-
-
-        });
-
-
-    }
 
     private void setOnClickListeners() {
         actionA.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 performExpandOrCollapse();
-
 
 
             }
@@ -124,8 +106,10 @@ public class MainActivity2 extends Activity {
         actionD.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                deleteImage(imgFile);
+                startCamera();
 
-                cddc.show();
+                //cddc.show();
 
             }
         });
@@ -148,9 +132,23 @@ public class MainActivity2 extends Activity {
         });
 
 
+    }
+
+    /*
+    Delete en fil
+     */
+    private void deleteImage(File file) {
+        File  f= new File(String.valueOf(file));
+        Toast.makeText(getApplicationContext(), "Deleted!", Toast.LENGTH_SHORT).show();
+        getContentResolver().delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                MediaStore.Images.Media.DATA + "=?", new String[]{f.toString()});
 
     }
 
+
+    /*
+    Metod som tar emot speechInput
+     */
     private void promptSpeechInput() {
         Intent intent = new Intent(
                 RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -169,6 +167,9 @@ public class MainActivity2 extends Activity {
         }
     }
 
+    /*
+    Metoden som tar emot resultatet från Speech
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -196,6 +197,9 @@ public class MainActivity2 extends Activity {
         }
     }
 
+    /*
+    Metod för att hantera så att tal-till-text ska skriva ut punkter osv
+     */
     private String handleSpeech(String descriptionText) {
 
         /**
@@ -218,6 +222,9 @@ public class MainActivity2 extends Activity {
 
     }
 
+    /*
+    Metod som sätter stora bokstäver vid ny mening
+     */
     private String handleCapitalLetters(String s) {
         String temp = s;
         char first = s.charAt(0);
@@ -241,6 +248,9 @@ public class MainActivity2 extends Activity {
         return sb.toString();
     }
 
+    /*
+    Metoden som antingen collapsar eller expandar
+     */
     private void performExpandOrCollapse() {
 
         if (expanded) {
@@ -253,12 +263,34 @@ public class MainActivity2 extends Activity {
         }
     }
 
+    /*
+    tilldelar alla komponenter värden
+     */
     private void init() {
 
         /*
         Om det ska finnas ett state
          */
         state = NEW_IMAGE;
+
+
+         /*
+        MainBilden med dess komponenter
+         */
+        date = (TextView) findViewById(R.id.chosen_image_date);
+        Calendar c = Calendar.getInstance();
+        df = new SimpleDateFormat("dd-MMM-yyyy");
+        formattedDate = df.format(c.getTime());
+        date.setText(handleDate(formattedDate)); // Ändra till datum då bilden togs
+        cityName = (TextView) findViewById(R.id.cityName);
+        image = (ImageView) findViewById(R.id.image);
+        String city = getCityName();
+        if (city != null) {
+            cityName.setText(city);
+        } else {
+            cityName.setText("");
+        }
+
 
         /*
         Check om vi kommer från en nytagen bild
@@ -301,22 +333,7 @@ public class MainActivity2 extends Activity {
         collapsAnimation.setDuration(500);
         hide = (TextView) findViewById(R.id.hide);
 
-        /*
-        MainBilden med dess komponenter
-         */
-        date = (TextView) findViewById(R.id.chosen_image_date);
-        Calendar c = Calendar.getInstance();
-        df = new SimpleDateFormat("dd-MMM-yyyy");
-        formattedDate = df.format(c.getTime());
-        date.setText(handleDate(formattedDate)); // Ändra till datum då bilden togs
-        cityName = (TextView) findViewById(R.id.cityName);
-        image = (ImageView) findViewById(R.id.image);
-        String city = getCityName();
-        if (city != null) {
-            cityName.setText(city);
-        } else {
-            cityName.setText("");
-        }
+
 
 
 
@@ -345,6 +362,9 @@ public class MainActivity2 extends Activity {
     }
 
 
+    /*
+    Metod för att skriva ut datumet på rätt sätt
+     */
     private String handleDate(String formattedDate) {
         String returnValue = formattedDate;
 
@@ -364,14 +384,17 @@ public class MainActivity2 extends Activity {
         return returnValue;
     }
 
-    public void showOtherOption(View view) {
-        startActivity(new Intent(this, MainActivity.class));
-    }
-
-    public void startNext(View view) {
+    /*
+    Startar kameran
+     */
+    public void startCamera() {
         startActivity(new Intent(this, CameraActivity2.class));
     }
 
+
+    /*
+    Hämtar namnet på staden man befinner sig
+     */
     public String getCityName() {
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -401,6 +424,10 @@ public class MainActivity2 extends Activity {
         return null;
     }
 
+
+    /*
+    Aminationen för expand/collapse
+     */
     private class ResizeAnimation extends Animation {
         final int targetHeight;
         View view;

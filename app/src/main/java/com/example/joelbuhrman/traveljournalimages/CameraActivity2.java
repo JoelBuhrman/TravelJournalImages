@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -30,13 +31,6 @@ import butterknife.InjectView;
  */
 public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.Callback {
     private android.hardware.Camera camera;
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        finish();
-    }
-
     @InjectView(R.id.surfaceView)
     SurfaceView surfaceView;
     @InjectView(R.id.btn_take_photo)
@@ -47,8 +41,15 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
     private String takenImagePath, date, photoFile, file_name;
     private SimpleDateFormat simpleDateFormat;
     private File picfile;
-    private ImageView flip;
-    private boolean frontCamera;
+    private ImageView flip, flash, flashShadow;
+    // Flash modes supported by this camera
+    private List<String> mSupportedFlashModes;
+    private boolean frontCamera, autoFlashActivated;
+    FileOutputStream outputStream;
+    File file_image;
+    Intent intent, intent2;
+
+
 
 
     @Override
@@ -57,17 +58,24 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
         setContentView(R.layout.camera_dema_alt2);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         ButterKnife.inject(this);
-
-
         init();
         setOnClickListeners();
-
-
         jpegCallback = getJpegCallback();
 
 
     }
 
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
+
+
+    /*
+    Detektera klick på flash och flip
+     */
     private void setOnClickListeners() {
         btn_take_photo.setOnClickListener(new FloatingActionButton.OnClickListener() {
             @Override
@@ -85,8 +93,21 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
                 flipCamera();
             }
         });
+
+        flash.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setFlashMode();
+            }
+        });
+
+
     }
 
+
+    /*
+    Tilldela alla komponenter
+     */
     private void init() {
         simpleDateFormat = new SimpleDateFormat("yyyymmddhhmmss");
         date = simpleDateFormat.format(new Date());
@@ -95,14 +116,28 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         flip = (ImageView) findViewById(R.id.flip_icon);
         frontCamera = false;
+        flash = (ImageView) findViewById(R.id.flash_icon);
+        flashShadow = (ImageView) findViewById(R.id.flash_shadow);
+
+
+        outputStream = null;
+        intent = new Intent(getApplicationContext(), MainActivity2.class);
+        intent2 = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+
     }
 
+
+    /*
+    Spara till fotogalleriet
+     */
     private void refreshGallery(File file) {
-        Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        intent.setData(Uri.fromFile(file));
-        sendBroadcast(intent);
+
+        intent2.setData(Uri.fromFile(file));
+        sendBroadcast(intent2);
+
 
     }
+
 
     public void refreshCamera() {
         if (surfaceHolder.getSurface() == null) {
@@ -122,22 +157,45 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
         }
     }
 
+
+    /*
+    Hämta filen som skapats
+     */
     private File getDirc() {
         File dics = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-        return new File(dics, "Camera_Demo");
+        return new File(dics, "Travel Journey");
     }
 
+    /*
+    Helt enkelt ta bild
+     */
     public void cameraImage() {
         camera.takePicture(null, null, jpegCallback);
 
     }
 
+    /*
+    Sätt inställningar till vår surfaceview (previewskärmen)
+     */
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
 
         try {
             //camera = android.hardware.Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
             camera = android.hardware.Camera.open();
+            mSupportedFlashModes = camera.getParameters().getSupportedFlashModes();
+
+
+
+
+            // Set the camera to Auto Flash mode.
+            if (mSupportedFlashModes != null && mSupportedFlashModes.contains(Camera.Parameters.FLASH_MODE_AUTO)) {
+                Camera.Parameters parameters = camera.getParameters();
+                parameters.setFlashMode(Camera.Parameters.FLASH_MODE_AUTO);
+                parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+                camera.setParameters(parameters);
+                autoFlashActivated = true;
+            }
         } catch (RuntimeException e) {
 
         }
@@ -158,11 +216,18 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
 
     }
 
+    /*
+    När något ändras, tex om man kunde flipat skärmen.
+     */
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
         refreshCamera();
     }
 
+
+    /*
+    Om kameran lämnas
+     */
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
         //camera.stopPreview();
@@ -170,18 +235,22 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
         //camera = null;
     }
 
+
+    /*
+    skapa filen osv
+     */
     public Camera.PictureCallback getJpegCallback() {
         return new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(byte[] bytes, Camera camera) {
-                FileOutputStream outputStream = null;
-                File file_image = getDirc();
+
+                file_image = getDirc();
                 if (!file_image.exists() && !file_image.mkdirs()) {
                     Toast.makeText(getApplicationContext(), "Can't create directory to save Image", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                photoFile = "Cam_Demo" + date + ".jpg";
+                photoFile = "Travel Journey" + date + ".jpg";
                 file_name = file_image.getAbsolutePath() + "/" + photoFile;
                 picfile = new File(file_name);
                 try {
@@ -196,22 +265,20 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
 
                 }
                 takenImagePath = file_name;
-                Intent intent = new Intent(getApplicationContext(), MainActivity2.class);
                 intent.putExtra("file_name", takenImagePath);
+                Toast.makeText(getApplicationContext(), takenImagePath, Toast.LENGTH_LONG).show();
                 startActivity(intent);
                 refreshGallery(picfile);
-                finish();
-/*
-                Toast.makeText(getApplicationContext(), "Picture saved", Toast.LENGTH_SHORT).show();
-
-                refreshCamera();
-                refreshGallery(picfile);*/
 
 
             }
         };
     }
 
+
+    /*
+    flipa kameran vid klick på flip
+     */
     public void flipCamera() {
         if (frontCamera) {
             camera.stopPreview();
@@ -237,6 +304,35 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
             camera.setDisplayOrientation(90);
             camera.startPreview();
             frontCamera = true;
+        }
+    }
+
+    /*
+    Sätt flash till off eller auto
+     */
+    private void setFlashMode() {
+        if (autoFlashActivated) {
+            if (mSupportedFlashModes != null && mSupportedFlashModes.contains(Camera.Parameters.FLASH_MODE_AUTO)) {
+                Camera.Parameters parameters = camera.getParameters();
+                parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                camera.setParameters(parameters);
+                autoFlashActivated = false;
+
+                flash.setImageResource(R.drawable.vector_drawable_ic_flash_off_white___px);
+                flashShadow.setImageResource(R.drawable.vector_drawable_ic_flash_off_black___px);
+            }
+
+        } else {
+
+            if (mSupportedFlashModes != null && mSupportedFlashModes.contains(Camera.Parameters.FLASH_MODE_AUTO)) {
+                Camera.Parameters parameters = camera.getParameters();
+                parameters.setFlashMode(Camera.Parameters.FLASH_MODE_AUTO);
+                camera.setParameters(parameters);
+                autoFlashActivated = true;
+                flash.setImageResource(R.drawable.vector_drawable_ic_flash_auto_white___px);
+                flashShadow.setImageResource(R.drawable.vector_drawable_ic_flash_auto_black___px);
+            }
+
         }
     }
 
