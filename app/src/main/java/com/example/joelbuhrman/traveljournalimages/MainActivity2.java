@@ -1,13 +1,21 @@
 package com.example.joelbuhrman.traveljournalimages;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
+import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.Animation;
@@ -23,16 +31,24 @@ import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by JoelBuhrman on 16-04-05.
  */
 public class MainActivity2 extends Activity {
+    private static int NEW_IMAGE = 0;
+    private static int OLD_IMAGE = 1;
+    CustomDialogCommandsClass cdcc;
+    CustomDialogDeleteClass cddc;
+    private int state;
     private ImageView image;
-    private ImageButton mic, info;
+    private ImageButton mic, info, cancelDelete;
     private FloatingActionButton actionA, actionB, actionC, actionD;
     private EditText editText;
     private FloatingActionsMenu menuMultipleActions;
@@ -40,7 +56,7 @@ public class MainActivity2 extends Activity {
     SimpleDateFormat df;
     String formattedDate;
     private RelativeLayout relativeLayout, mainLayout;
-    private TextView tDescription, date, cityName, hide;
+    private TextView tDescription, date, cityName, hide, yesDelete, noDelete;
     File imgFile;
     ResizeAnimation expandAnimation, collapsAnimation;
     protected static final int RESULT_SPEECH = 1;
@@ -83,7 +99,7 @@ public class MainActivity2 extends Activity {
             @Override
             public void onClick(View view) {
                 performExpandOrCollapse();
-                // menuMultipleActions.toggle();
+
 
 
             }
@@ -101,18 +117,16 @@ public class MainActivity2 extends Activity {
             public void onClick(View view) {
                 startActivity(new Intent(getApplicationContext(), CameraActivity2.class));
                 Toast.makeText(getApplicationContext(), "Saved!", Toast.LENGTH_SHORT).show();
+                finish();
             }
         });
 
         actionD.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (imgFile != null) {
-                    imgFile.delete();
-                }
 
-                startActivity(new Intent(getApplicationContext(), CameraActivity2.class));
-                Toast.makeText(getApplicationContext(), "Deleted!", Toast.LENGTH_SHORT).show();
+                cddc.show();
+
             }
         });
 
@@ -128,10 +142,12 @@ public class MainActivity2 extends Activity {
             @Override
             public void onClick(View view) {
 
-                CustomDialogClass cdd=new CustomDialogClass(MainActivity2.this);
-                cdd.show();
+
+                cdcc.show();
             }
         });
+
+
 
     }
 
@@ -171,7 +187,7 @@ public class MainActivity2 extends Activity {
                     } else {
 
 
-                        editText.setText(editText.getText().toString() + handleSpeech(text.get(0))+". ");
+                        editText.setText(editText.getText().toString() + handleSpeech(text.get(0)) + ". ");
                     }
                 }
                 break;
@@ -238,68 +254,90 @@ public class MainActivity2 extends Activity {
     }
 
     private void init() {
-        editText = (EditText) findViewById(R.id.editText);
-        date = (TextView) findViewById(R.id.chosen_image_date);
-        Calendar c = Calendar.getInstance();
-        df = new SimpleDateFormat("dd-MMM-yyyy");
-        formattedDate = df.format(c.getTime());
-        date.setText(handleDate(formattedDate)); // Ändra till datum då bilden togs
-        info= (ImageButton)findViewById(R.id.info);
 
-        cityName = (TextView) findViewById(R.id.cityName);
+        /*
+        Om det ska finnas ett state
+         */
+        state = NEW_IMAGE;
 
-
-        image = (ImageView) findViewById(R.id.image);
-        mic = (ImageButton) findViewById(R.id.mic);
-
-
+        /*
+        Check om vi kommer från en nytagen bild
+         */
         if (getIntent().getStringExtra("file_name") != null) {
             imgFile = new File(getIntent().getStringExtra("file_name").toString());
             if (imgFile.exists()) {
-
                 Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-
-
                 image.setImageBitmap(RotateBitmap(myBitmap, 90));
 
             } else {
                 Toast.makeText(this, "Couldn't find image", Toast.LENGTH_SHORT).show();
             }
-        } else {
-            // image.setImageResource(R.drawable.adventure);
         }
 
 
-        expanded = false;
-        image = (ImageView) findViewById(R.id.image);
-        //tDescription= (TextView)findViewById(R.id.description);
+        /*
+        Custom dialogerna
+         */
+        cdcc = new CustomDialogCommandsClass(MainActivity2.this);
+        cddc = new CustomDialogDeleteClass(MainActivity2.this, imgFile);
 
+
+
+        /*
+        Komponenterna i Descriptiondelen
+         */
+        editText = (EditText) findViewById(R.id.editText);
+        info = (ImageButton) findViewById(R.id.info);
+        mic = (ImageButton) findViewById(R.id.mic);
+        relativeLayout = (RelativeLayout) findViewById(R.id.relativeLayout);
+
+        /*
+        Det som sköter expandering och kollaps
+         */
+        expanded = false;
+        expandAnimation = new ResizeAnimation(relativeLayout, 800, 0);
+        expandAnimation.setDuration(500);
+        collapsAnimation = new ResizeAnimation(relativeLayout, 0, 800);
+        collapsAnimation.setDuration(500);
+        hide = (TextView) findViewById(R.id.hide);
+
+        /*
+        MainBilden med dess komponenter
+         */
+        date = (TextView) findViewById(R.id.chosen_image_date);
+        Calendar c = Calendar.getInstance();
+        df = new SimpleDateFormat("dd-MMM-yyyy");
+        formattedDate = df.format(c.getTime());
+        date.setText(handleDate(formattedDate)); // Ändra till datum då bilden togs
+        cityName = (TextView) findViewById(R.id.cityName);
+        image = (ImageView) findViewById(R.id.image);
+        String city = getCityName();
+        if (city != null) {
+            cityName.setText(city);
+        } else {
+            cityName.setText("");
+        }
+
+
+
+
+
+
+        /*
+        Vår floatingbutton med den knappar
+         */
         actionA = (FloatingActionButton) findViewById(R.id.action_a);
-        //actionB = (FloatingActionButton) findViewById(R.id.action_b);
         actionC = (FloatingActionButton) findViewById(R.id.action_c);
         actionD = (FloatingActionButton) findViewById(R.id.action_d);
         menuMultipleActions = (FloatingActionsMenu) findViewById(R.id.multiple_actions);
 
-        relativeLayout = (RelativeLayout) findViewById(R.id.relativeLayout);
-        mainLayout = (RelativeLayout) findViewById(R.id.mainLayout);
-
-        expandAnimation = new ResizeAnimation(
-                relativeLayout,
-                800,
-                0
-        );
-        expandAnimation.setDuration(500);
-        collapsAnimation = new ResizeAnimation(
-                relativeLayout,
-                0,
-                800
-        );
-        collapsAnimation.setDuration(500);
-        hide = (TextView) findViewById(R.id.hide);
 
     }
 
 
+    /*
+    Metod för att bilden ska vara rättvänd
+     */
     public static Bitmap RotateBitmap(Bitmap source, float angle) {
         Matrix matrix = new Matrix();
         matrix.postRotate(angle);
@@ -334,6 +372,34 @@ public class MainActivity2 extends Activity {
         startActivity(new Intent(this, CameraActivity2.class));
     }
 
+    public String getCityName() {
+        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return null;
+        }
+        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+        double longitude = location.getLongitude();
+        double latitude = location.getLatitude();
+        Geocoder gcd = new Geocoder(getApplicationContext(), Locale.getDefault());
+        List<Address> addresses = null;
+        try {
+            addresses = gcd.getFromLocation(latitude, longitude, 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (addresses.size() > 0) {
+            return addresses.get(0).getLocality();
+        }
+        return null;
+    }
 
     private class ResizeAnimation extends Animation {
         final int targetHeight;
@@ -362,5 +428,11 @@ public class MainActivity2 extends Activity {
         public boolean willChangeBounds() {
             return true;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 }

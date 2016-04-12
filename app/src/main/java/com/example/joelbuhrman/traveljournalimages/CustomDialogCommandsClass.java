@@ -10,14 +10,14 @@ import android.widget.ImageButton;
 /**
  * Created by JoelBuhrman on 16-04-09.
  */
-public class CustomDialogClass extends Dialog implements
+public class CustomDialogCommandsClass extends Dialog implements
         android.view.View.OnClickListener {
 
     public Activity c;
     public Dialog d;
     public ImageButton close;
 
-    public CustomDialogClass(Activity a) {
+    public CustomDialogCommandsClass(Activity a) {
         super(a);
         // TODO Auto-generated constructor stub
         this.c = a;
