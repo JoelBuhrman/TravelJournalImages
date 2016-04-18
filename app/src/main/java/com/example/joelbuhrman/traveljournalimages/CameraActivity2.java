@@ -11,6 +11,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.melnykov.fab.FloatingActionButton;
@@ -48,8 +49,8 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
     FileOutputStream outputStream;
     File file_image;
     Intent intent, intent2;
-
-
+    private TextView direction;
+    private Compass compass;
 
 
     @Override
@@ -111,6 +112,7 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
     private void init() {
         simpleDateFormat = new SimpleDateFormat("yyyymmddhhmmss");
         date = simpleDateFormat.format(new Date());
+
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(this);
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
@@ -123,6 +125,10 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
         outputStream = null;
         intent = new Intent(getApplicationContext(), MainActivity2.class);
         intent2 = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+
+        direction= (TextView)findViewById(R.id.direction);
+        compass= new Compass(this, direction);
+        compass.start();
 
     }
 
@@ -163,6 +169,7 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
      */
     private File getDirc() {
         File dics = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+
         return new File(dics, "Travel Journey");
     }
 
@@ -184,8 +191,6 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
             //camera = android.hardware.Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
             camera = android.hardware.Camera.open();
             mSupportedFlashModes = camera.getParameters().getSupportedFlashModes();
-
-
 
 
             // Set the camera to Auto Flash mode.
@@ -253,6 +258,8 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
                 photoFile = "Travel Journey" + date + ".jpg";
                 file_name = file_image.getAbsolutePath() + "/" + photoFile;
                 picfile = new File(file_name);
+
+
                 try {
                     outputStream = new FileOutputStream(picfile);
                     outputStream.write(bytes);
@@ -264,11 +271,17 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
                 } finally {
 
                 }
-                takenImagePath = file_name;
-                intent.putExtra("file_name", takenImagePath);
-                Toast.makeText(getApplicationContext(), takenImagePath, Toast.LENGTH_LONG).show();
+
+
+                intent.putExtra("file_name", file_name);
+                if (frontCamera) {
+                    intent.putExtra("camera_type", "front");
+                } else {
+                    intent.putExtra("camera_type", "back");
+                }
                 startActivity(intent);
                 refreshGallery(picfile);
+                finish();
 
 
             }
@@ -285,6 +298,7 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
             camera.release();
             camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_BACK);
             try {
+
                 camera.setPreviewDisplay(surfaceHolder);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -301,6 +315,7 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
             camera.setDisplayOrientation(90);
             camera.startPreview();
             frontCamera = true;
@@ -335,6 +350,7 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
 
         }
     }
+
 
 
 }

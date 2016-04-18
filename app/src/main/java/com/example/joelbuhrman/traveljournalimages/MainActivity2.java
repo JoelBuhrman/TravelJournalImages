@@ -2,8 +2,10 @@ package com.example.joelbuhrman.traveljournalimages;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -106,8 +108,32 @@ public class MainActivity2 extends Activity {
         actionD.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                deleteImage(imgFile);
-                startCamera();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        if (!isFinishing()) {
+                            new AlertDialog.Builder(MainActivity2.this)
+                                    .setTitle("Delete Image?")
+                                    .setMessage("Are you sure you want to delete this image?")
+                                    .setCancelable(false)
+                                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            deleteImage(imgFile);
+                                            startCamera();
+                                            finish();
+
+                                        }
+                                    }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+
+                                }
+                            }).create().show();
+                        }
+                    }
+                });
 
                 //cddc.show();
 
@@ -138,7 +164,7 @@ public class MainActivity2 extends Activity {
     Delete en fil
      */
     private void deleteImage(File file) {
-        File  f= new File(String.valueOf(file));
+        File f = new File(String.valueOf(file));
         Toast.makeText(getApplicationContext(), "Deleted!", Toast.LENGTH_SHORT).show();
         getContentResolver().delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 MediaStore.Images.Media.DATA + "=?", new String[]{f.toString()});
@@ -188,7 +214,7 @@ public class MainActivity2 extends Activity {
                     } else {
 
 
-                        editText.setText(editText.getText().toString() + handleSpeech(text.get(0)) + ". ");
+                        editText.setText(editText.getText().toString() + handleSpeech(text.get(0)));
                     }
                 }
                 break;
@@ -240,7 +266,8 @@ public class MainActivity2 extends Activity {
 
             if (c == '.' || c == '!' || c == '?') {
                 t = Character.toUpperCase(t);
-                sb.replace(i, i, String.valueOf(t));
+
+                sb.replace(i, i + 1, String.valueOf(t));
             }
         }
 
@@ -299,7 +326,13 @@ public class MainActivity2 extends Activity {
             imgFile = new File(getIntent().getStringExtra("file_name").toString());
             if (imgFile.exists()) {
                 Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                image.setImageBitmap(RotateBitmap(myBitmap, 90));
+                if (getIntent().getStringExtra("camera_type").toString().equals("front")) {
+                    image.setImageBitmap(RotateBitmap(myBitmap, 270)); //Blir spegelvänd..
+                    image.setScaleX(-1);//Fulfix, rättvänd i appen atm
+
+                } else {
+                    image.setImageBitmap(RotateBitmap(myBitmap, 90));
+                }
 
             } else {
                 Toast.makeText(this, "Couldn't find image", Toast.LENGTH_SHORT).show();
@@ -347,6 +380,7 @@ public class MainActivity2 extends Activity {
         actionC = (FloatingActionButton) findViewById(R.id.action_c);
         actionD = (FloatingActionButton) findViewById(R.id.action_d);
         menuMultipleActions = (FloatingActionsMenu) findViewById(R.id.multiple_actions);
+
 
 
     }
@@ -460,6 +494,7 @@ public class MainActivity2 extends Activity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+
         finish();
     }
 }
