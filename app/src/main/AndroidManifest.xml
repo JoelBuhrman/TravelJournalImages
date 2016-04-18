@@ -5,6 +5,9 @@
     <uses-feature android:name="android.hardware.camera2" />
     <uses-feature android:name="android.hardware.camera2.autofocus" />
     <protected-broadcast android:name="android.intent.action.MEDIA_MOUNTED" />
+    <uses-feature android:glEsVersion="0x00020000" android:required="true" />
+
+
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -34,14 +37,13 @@
             android:name=".MainActivity2"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-
-            </intent-filter>
+<intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" /></intent-filter>
 
         </activity><!-- ATTENTION: This was auto-generated to add Google Play services to your project for
      App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
+
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />

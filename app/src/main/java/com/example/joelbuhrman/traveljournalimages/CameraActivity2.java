@@ -263,7 +263,6 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
     skapa filen osv
      */
     public Camera.PictureCallback getJpegCallback() {
-
         return new Camera.PictureCallback() {
 
             @Override
@@ -276,7 +275,7 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
                     return;
                 }
 
-                photoFile = "Travel Journey%" + date + "%" + cityName + "%.jpg";
+                photoFile = "Travel Journey%" + date + "%" + cityName +"%"+direction.getText() +"%.jpg";
                 file_name = file_image.getAbsolutePath() + "/" + photoFile;
                 picfile = new File(file_name);
 

@@ -20,9 +20,11 @@ import android.provider.MediaStore;
 import android.speech.RecognizerIntent;
 import android.support.v4.app.ActivityCompat;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -35,33 +37,35 @@ import com.getbase.floatingactionbutton.FloatingActionsMenu;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 /**
  * Created by JoelBuhrman on 16-04-05.
  */
 public class MainActivity2 extends Activity {
-    private static int NEW_IMAGE = 0;
-    private static int OLD_IMAGE = 1;
     CustomDialogCommandsClass cdcc;
-    CustomDialogDeleteClass cddc;
+    private Button button;
     private ImageView image;
     private ImageButton mic, info;
-    private FloatingActionButton actionA,  actionC, actionD;
+    private FloatingActionButton actionA, actionB, actionC, actionD;
     private EditText editText;
     private FloatingActionsMenu menuMultipleActions;
     private boolean expanded;
-    SimpleDateFormat df;
-    String formattedDate;
-    private RelativeLayout relativeLayout;
-    private TextView  date, cityName, hide;
+    private RelativeLayout descriptionLayout, filterLayout;
+    private TextView  date, cityName, hide, direction;
     File imgFile;
     ResizeAnimation expandAnimation, collapsAnimation;
     protected static final int RESULT_SPEECH = 1;
+    private String path;
+    private ImageView filter;
+    int[] filters= {R.drawable.filtertest, R.drawable.filter2, R.drawable.filter3, R.drawable.filter4, R.drawable.filter5, R.drawable.filter6, R.drawable.filter7, R.drawable.filter8, R.drawable.filter9, R.drawable.filter10, R.drawable.filter12};
 
+
+    Random rand= new Random();
+    int i =0;
 
 
     @Override
@@ -70,14 +74,23 @@ public class MainActivity2 extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main_alt2);
 
-        init();
-        setOnClickListeners();
 
+
+        init();
 
     }
 
 
     private void setOnClickListeners() {
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                 filter.setImageResource(filters[rand.nextInt(filters.length)]);
+
+            }
+        });
+
         actionA.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -94,9 +107,24 @@ public class MainActivity2 extends Activity {
             }
         });
 
+        actionB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                RelativeLayout.LayoutParams rel_btn = new RelativeLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, 200);
+                rel_btn.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+                filterLayout.setLayoutParams(rel_btn);
+                menuMultipleActions.setVisibility(View.INVISIBLE);
+            }
+        });
+
         actionC.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                /*
+                Starta kamera
+                 */
                 startActivity(new Intent(getApplicationContext(), CameraActivity2.class));
                 Toast.makeText(getApplicationContext(), "Saved!", Toast.LENGTH_SHORT).show();
                 finish();
@@ -123,7 +151,7 @@ public class MainActivity2 extends Activity {
                                             finish();
 
                                         }
-                                    }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
 
@@ -279,10 +307,10 @@ public class MainActivity2 extends Activity {
     private void performExpandOrCollapse() {
 
         if (expanded) {
-            relativeLayout.startAnimation(collapsAnimation);
+            descriptionLayout.startAnimation(collapsAnimation);
             expanded = false;
         } else {
-            relativeLayout.startAnimation(expandAnimation);
+            descriptionLayout.startAnimation(expandAnimation);
             expanded = true;
 
         }
@@ -301,6 +329,10 @@ public class MainActivity2 extends Activity {
         //date.setText(handleDate(formattedDate)); // Ändra till datum då bilden togs
         cityName = (TextView) findViewById(R.id.cityName);
         image = (ImageView) findViewById(R.id.image);
+        direction= (TextView)findViewById(R.id.main_direction);
+        filter= (ImageView)findViewById(R.id.filter);
+        filterLayout=(RelativeLayout)findViewById(R.id.filterLayout);
+
 
 
 
@@ -310,10 +342,13 @@ public class MainActivity2 extends Activity {
         if (getIntent().getStringExtra("file_name") != null) {
             imgFile = new File(getIntent().getStringExtra("file_name").toString());
             if (imgFile.exists()) {
-                String path = imgFile.getAbsolutePath();
+                path = imgFile.getAbsolutePath();
                 Bitmap myBitmap = BitmapFactory.decodeFile(path);
 
                 if (getIntent().getStringExtra("camera_type").toString().equals("front")) {
+
+
+
                     image.setImageBitmap(RotateBitmap(myBitmap, 270)); //Blir spegelvänd..
                     image.setScaleX(-1);//Fulfix, rättvänd i appen atm
 
@@ -324,6 +359,7 @@ public class MainActivity2 extends Activity {
                 String[] info = path.split("%");
                 date.setText(handleDate(info[1]));
                 cityName.setText(info[2]);
+                direction.setText(info[3]);
 
             } else {
                 Toast.makeText(this, "Couldn't find image", Toast.LENGTH_SHORT).show();
@@ -335,9 +371,6 @@ public class MainActivity2 extends Activity {
         Custom dialogerna
          */
         cdcc = new CustomDialogCommandsClass(MainActivity2.this);
-        cddc = new CustomDialogDeleteClass(MainActivity2.this, imgFile);
-
-
 
         /*
         Komponenterna i Descriptiondelen
@@ -345,15 +378,15 @@ public class MainActivity2 extends Activity {
         editText = (EditText) findViewById(R.id.editText);
         info = (ImageButton) findViewById(R.id.info);
         mic = (ImageButton) findViewById(R.id.mic);
-        relativeLayout = (RelativeLayout) findViewById(R.id.relativeLayout);
+        descriptionLayout = (RelativeLayout) findViewById(R.id.relativeLayout);
 
         /*
         Det som sköter expandering och kollaps
          */
         expanded = false;
-        expandAnimation = new ResizeAnimation(relativeLayout, 800, 0);
+        expandAnimation = new ResizeAnimation(descriptionLayout, 800, 0);
         expandAnimation.setDuration(500);
-        collapsAnimation = new ResizeAnimation(relativeLayout, 0, 800);
+        collapsAnimation = new ResizeAnimation(descriptionLayout, 0, 800);
         collapsAnimation.setDuration(500);
         hide = (TextView) findViewById(R.id.hide);
 
@@ -368,12 +401,17 @@ public class MainActivity2 extends Activity {
         Vår floatingbutton med den knappar
          */
         actionA = (FloatingActionButton) findViewById(R.id.action_a);
+        actionB= (FloatingActionButton)findViewById(R.id.action_filter);
         actionC = (FloatingActionButton) findViewById(R.id.action_c);
         actionD = (FloatingActionButton) findViewById(R.id.action_d);
+
         menuMultipleActions = (FloatingActionsMenu) findViewById(R.id.multiple_actions);
 
 
+
+
     }
+
 
 
     /*
@@ -490,10 +528,55 @@ public class MainActivity2 extends Activity {
         }
     }
 
+    public void setFilter(View view){
+        switch (view.getId()){
+            case R.id.filter1:
+                filter.setImageResource(filters[0]);
+                break;
+            case R.id.filter2:
+                filter.setImageResource(filters[1]);
+                break;
+            case R.id.filter3:
+                filter.setImageResource(filters[2]);
+                break;
+            case R.id.filter4:
+                filter.setImageResource(filters[3]);
+                break;
+            case R.id.filter5:
+                filter.setImageResource(filters[4]);
+                break;
+            case R.id.filter6:
+                filter.setImageResource(filters[5]);
+                break;
+            case R.id.filter7:
+                filter.setImageResource(filters[6]);
+                break;
+            case R.id.filter8:
+                filter.setImageResource(filters[7]);
+                break;
+            case R.id.filter9:
+                filter.setImageResource(filters[8]);
+                break;
+            case R.id.filter10:
+                filter.setImageResource(filters[9]);
+                break;
+            case R.id.filter11:
+                filter.setImageResource(filters[10]);
+                break;
+            default:
+                Toast.makeText(getApplicationContext(), "yep", Toast.LENGTH_SHORT).show();
+                break;
+
+        }
+
+    }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
 
         finish();
     }
+
+
 }
