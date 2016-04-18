@@ -1,16 +1,25 @@
 package com.example.joelbuhrman.traveljournalimages;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +32,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -39,7 +49,7 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
     private SurfaceHolder surfaceHolder;
     private android.hardware.Camera.PictureCallback jpegCallback;
     private android.hardware.Camera.ShutterCallback shutterCallback;
-    private String takenImagePath, date, photoFile, file_name;
+    private String takenImagePath, date, photoFile, file_name, cityName;
     private SimpleDateFormat simpleDateFormat;
     private File picfile;
     private ImageView flip, flash, flashShadow;
@@ -51,6 +61,7 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
     Intent intent, intent2;
     private TextView direction;
     private Compass compass;
+    private ProgressBar progressBar;
 
 
     @Override
@@ -110,7 +121,7 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
     Tilldela alla komponenter
      */
     private void init() {
-        simpleDateFormat = new SimpleDateFormat("yyyymmddhhmmss");
+        simpleDateFormat = new SimpleDateFormat("dd-MMM-yyyy");
         date = simpleDateFormat.format(new Date());
 
         surfaceHolder = surfaceView.getHolder();
@@ -126,9 +137,14 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
         intent = new Intent(getApplicationContext(), MainActivity2.class);
         intent2 = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
 
-        direction= (TextView)findViewById(R.id.direction);
-        compass= new Compass(this, direction);
+        cityName = getCityName();
+
+        direction = (TextView) findViewById(R.id.direction);
+        compass = new Compass(this, direction, "back");
         compass.start();
+
+        progressBar = (ProgressBar)findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.GONE);
 
     }
 
@@ -168,6 +184,7 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
     Hämta filen som skapats
      */
     private File getDirc() {
+
         File dics = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
 
         return new File(dics, "Travel Journey");
@@ -177,6 +194,7 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
     Helt enkelt ta bild
      */
     public void cameraImage() {
+        progressBar.setVisibility(View.VISIBLE);
         camera.takePicture(null, null, jpegCallback);
 
     }
@@ -245,22 +263,26 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
     skapa filen osv
      */
     public Camera.PictureCallback getJpegCallback() {
+
         return new Camera.PictureCallback() {
+
             @Override
             public void onPictureTaken(byte[] bytes, Camera camera) {
 
                 file_image = getDirc();
+
                 if (!file_image.exists() && !file_image.mkdirs()) {
                     Toast.makeText(getApplicationContext(), "Can't create directory to save Image", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                photoFile = "Travel Journey" + date + ".jpg";
+                photoFile = "Travel Journey%" + date + "%" + cityName + "%.jpg";
                 file_name = file_image.getAbsolutePath() + "/" + photoFile;
                 picfile = new File(file_name);
 
 
                 try {
+
                     outputStream = new FileOutputStream(picfile);
                     outputStream.write(bytes);
                     outputStream.close();
@@ -279,6 +301,7 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
                 } else {
                     intent.putExtra("camera_type", "back");
                 }
+
                 startActivity(intent);
                 refreshGallery(picfile);
                 finish();
@@ -320,6 +343,7 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
             camera.startPreview();
             frontCamera = true;
         }
+        compass.changeCam();
     }
 
     /*
@@ -352,5 +376,33 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
     }
 
 
+    public String getCityName() {
+        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return null;
+        }
+        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
+        double longitude = location.getLongitude();
+        double latitude = location.getLatitude();
+        Geocoder gcd = new Geocoder(getApplicationContext(), Locale.getDefault());
+        List<Address> addresses = null;
+        try {
+            addresses = gcd.getFromLocation(latitude, longitude, 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (addresses.size() > 0) {
+            return addresses.get(0).getLocality();
+        }
+        return null;
+    }
 }
+

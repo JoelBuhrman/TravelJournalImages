@@ -37,7 +37,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -49,21 +48,20 @@ public class MainActivity2 extends Activity {
     private static int OLD_IMAGE = 1;
     CustomDialogCommandsClass cdcc;
     CustomDialogDeleteClass cddc;
-    private int state;
     private ImageView image;
-    private ImageButton mic, info, cancelDelete;
-    private FloatingActionButton actionA, actionB, actionC, actionD;
+    private ImageButton mic, info;
+    private FloatingActionButton actionA,  actionC, actionD;
     private EditText editText;
     private FloatingActionsMenu menuMultipleActions;
     private boolean expanded;
     SimpleDateFormat df;
     String formattedDate;
-    private RelativeLayout relativeLayout, mainLayout;
-    private TextView tDescription, date, cityName, hide, yesDelete, noDelete;
+    private RelativeLayout relativeLayout;
+    private TextView  date, cityName, hide;
     File imgFile;
     ResizeAnimation expandAnimation, collapsAnimation;
     protected static final int RESULT_SPEECH = 1;
-    private String descriptionText;
+
 
 
     @Override
@@ -295,28 +293,15 @@ public class MainActivity2 extends Activity {
      */
     private void init() {
 
-        /*
-        Om det ska finnas ett state
-         */
-        state = NEW_IMAGE;
-
-
          /*
         MainBilden med dess komponenter
          */
         date = (TextView) findViewById(R.id.chosen_image_date);
-        Calendar c = Calendar.getInstance();
-        df = new SimpleDateFormat("dd-MMM-yyyy");
-        formattedDate = df.format(c.getTime());
-        date.setText(handleDate(formattedDate)); // Ändra till datum då bilden togs
+
+        //date.setText(handleDate(formattedDate)); // Ändra till datum då bilden togs
         cityName = (TextView) findViewById(R.id.cityName);
         image = (ImageView) findViewById(R.id.image);
-        String city = getCityName();
-        if (city != null) {
-            cityName.setText(city);
-        } else {
-            cityName.setText("");
-        }
+
 
 
         /*
@@ -325,14 +310,20 @@ public class MainActivity2 extends Activity {
         if (getIntent().getStringExtra("file_name") != null) {
             imgFile = new File(getIntent().getStringExtra("file_name").toString());
             if (imgFile.exists()) {
-                Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                String path = imgFile.getAbsolutePath();
+                Bitmap myBitmap = BitmapFactory.decodeFile(path);
+
                 if (getIntent().getStringExtra("camera_type").toString().equals("front")) {
                     image.setImageBitmap(RotateBitmap(myBitmap, 270)); //Blir spegelvänd..
                     image.setScaleX(-1);//Fulfix, rättvänd i appen atm
 
+
                 } else {
                     image.setImageBitmap(RotateBitmap(myBitmap, 90));
                 }
+                String[] info = path.split("%");
+                date.setText(handleDate(info[1]));
+                cityName.setText(info[2]);
 
             } else {
                 Toast.makeText(this, "Couldn't find image", Toast.LENGTH_SHORT).show();
@@ -382,7 +373,6 @@ public class MainActivity2 extends Activity {
         menuMultipleActions = (FloatingActionsMenu) findViewById(R.id.multiple_actions);
 
 
-
     }
 
 
@@ -406,7 +396,7 @@ public class MainActivity2 extends Activity {
             returnValue = returnValue.substring(1, returnValue.length());
         }
 
-        for (int i = 0; i < returnValue.length(); i++) {
+       /* for (int i = 0; i < returnValue.length(); i++) {
             if (returnValue.charAt(i) == '-') {
                 StringBuilder sb = new StringBuilder();
                 sb.append(returnValue.substring(0, i));
@@ -414,8 +404,17 @@ public class MainActivity2 extends Activity {
                 sb.append(returnValue.substring(i + 1, returnValue.length()));
                 returnValue = sb.toString();
             }
-        }
-        return returnValue;
+        }*/
+        String[] temp= returnValue.split("-");
+        StringBuilder sb =new StringBuilder();
+        sb.append(temp[0]+" ");
+        String month= temp[1];
+        char t = Character.toUpperCase(month.charAt(0));
+        month.replace(month.charAt(0), t);
+        sb.append(t);
+        sb.append(month.substring(1, month.length())+" ");
+        sb.append(temp[2]);
+        return sb.toString();
     }
 
     /*
