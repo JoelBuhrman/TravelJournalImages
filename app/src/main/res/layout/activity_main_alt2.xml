@@ -20,6 +20,18 @@
         android:scaleType="fitXY" />
 
 
+    <RelativeLayout
+        android:id="@+id/topRelLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_alignParentBottom="true"
+        android:animateLayoutChanges="true"
+        android:background="#80000000">
+
+
+
+    </RelativeLayout>
+
 
     <TextView
         android:id="@+id/main_direction"
@@ -29,6 +41,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_margin="16dp" />
+
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -41,7 +54,6 @@
             style="@style/ImageText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="showOtherOption"
             android:text="24 Aug 2015"
 
             />
@@ -51,7 +63,6 @@
             style="@style/ImageText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="startNext"
             android:text="San Francisco" />
 
     </LinearLayout>
@@ -71,7 +82,7 @@
         >
 
         <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/action_a"
+            android:id="@+id/action_pen"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             fab:fab_colorNormal="#fff"
@@ -95,7 +106,7 @@
             fab:fab_size="mini"></com.getbase.floatingactionbutton.FloatingActionButton>
 
         <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/action_c"
+            android:id="@+id/action_save"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             fab:fab_colorNormal="#fff"
@@ -104,7 +115,7 @@
             fab:fab_size="mini"></com.getbase.floatingactionbutton.FloatingActionButton>
 
         <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/action_d"
+            android:id="@+id/action_delete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             fab:fab_colorNormal="#ef4242"
@@ -263,10 +274,11 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Filter 12"
+                    android:text="None"
                     android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
                     style="@style/ImageText"
-                    android:id="@+id/filter12"
+                    android:id="@+id/none"
                     android:onClick="setFilter"
                     />
 
