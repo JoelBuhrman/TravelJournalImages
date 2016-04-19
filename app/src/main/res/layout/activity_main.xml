@@ -1,117 +1,316 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/relLayout"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/mainLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_gravity="bottom"
-    android:fitsSystemWindows="true"
-    tools:context=".MainActivity">
+    android:background="#fff">
 
     <ImageView
         android:id="@+id/image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="fitXY"
-        android:src="@drawable/adventure"/>
+        android:src="@drawable/alcatraz" />
+
+    <ImageView
+        android:id="@+id/filter"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY" />
+
+
+    <RelativeLayout
+        android:id="@+id/topRelLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_alignParentBottom="true"
+        android:animateLayoutChanges="true"
+        android:background="#80000000">
+
+
+
+    </RelativeLayout>
+
+
+    <TextView
+        android:id="@+id/main_direction"
+        style="@style/ImageText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="16dp" />
+
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="vertical"
+        android:padding="@dimen/defaultTextPaddingImage">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/chosen_image_date"
+            style="@style/ImageText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="@dimen/defaultTextPaddingImage">
+            android:text="24 Aug 2015"
 
-            <TextView
-                android:id="@+id/chosen_image_date"
-                style="@style/ImageText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="24 Aug 2015"
+            />
 
-                />
+        <TextView
+            android:id="@+id/cityName"
+            style="@style/ImageText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="San Francisco" />
 
-            <TextView
-                android:id="@+id/cityName"
-                style="@style/ImageText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Stockholm" />
-
-        </LinearLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="15dp"
-                android:layout_marginTop="16dp"
-                android:background="@null"
-                android:src="@drawable/vector_drawable_ic_cancel_black___px"
-
-                />
-
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_margin="16dp"
-                android:background="@null"
-                android:onClick="deleteClicked"
-                android:src="@drawable/vector_drawable_ic_cancel_white___px"
-
-
-                />
-        </RelativeLayout>
     </LinearLayout>
+
+
+    <com.getbase.floatingactionbutton.FloatingActionsMenu
+        android:id="@+id/multiple_actions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/linearLayout"
+        android:layout_alignParentRight="true"
+        fab:fab_addButtonColorNormal="#fff"
+        fab:fab_addButtonColorPressed="#fff"
+        fab:fab_addButtonPlusIconColor="#000"
+
+
+        >
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/action_pen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_colorNormal="#fff"
+            fab:fab_colorPressed="#fff"
+            fab:fab_icon="@drawable/vector_drawable_ic_mode_edit_black___px"
+
+            fab:fab_size="mini"
+
+            >
+
+
+        </com.getbase.floatingactionbutton.FloatingActionButton>
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/action_filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_colorNormal="#fff"
+            fab:fab_colorPressed="#fff"
+            fab:fab_icon="@drawable/vector_drawable_ic_filter_black___px"
+            fab:fab_size="mini"></com.getbase.floatingactionbutton.FloatingActionButton>
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/action_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_colorNormal="#fff"
+            fab:fab_colorPressed="#fff"
+            fab:fab_icon="@drawable/vector_drawable_ic_save_black___px"
+            fab:fab_size="mini"></com.getbase.floatingactionbutton.FloatingActionButton>
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/action_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_colorNormal="#ef4242"
+            fab:fab_colorPressed="#ef4242"
+            fab:fab_icon="@drawable/vector_drawable_ic_delete_black___px"
+            fab:fab_size="mini"></com.getbase.floatingactionbutton.FloatingActionButton>
+    </com.getbase.floatingactionbutton.FloatingActionsMenu>
 
 
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/relativeLayout"
         android:layout_centerHorizontal="true"
         android:gravity="center_horizontal"
-        android:layout_above="@+id/relativeLayout"
         android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/arrow"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/vector_drawable_ic_keyboard_arrow_up_white___px"
+        <!-- <ImageView
+             android:id="@+id/arrow"
+             android:layout_width="48dp"
+             android:layout_height="24dp"
+             android:scaleType="fitXY"
 
-            ></ImageView>
+             ></ImageView>
 
 
-        <TextView
-            android:id="@+id/description"
-            style="@style/ImageTextThin"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Description"
-
-            />
+         <TextView
+             android:id="@+id/description"
+             style="@style/ImageTextThin"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             />-->
 
     </LinearLayout>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:id="@+id/filterLayout"
+        android:background="#80000000"
+        android:layout_alignParentBottom="true"
+        >
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:orientation="horizontal"
+
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Filter 1"
+                    android:layout_marginLeft="16dp"
+                    style="@style/ImageText"
+                    android:onClick="setFilter"
+                    android:id="@+id/filter1"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Filter 2"
+                    android:layout_marginLeft="16dp"
+                    style="@style/ImageText"
+                    android:onClick="setFilter"
+                    android:id="@+id/filter2"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Filter 3"
+                    android:layout_marginLeft="16dp"
+                    style="@style/ImageText"
+                    android:onClick="setFilter"
+                    android:id="@+id/filter3"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Filter 4"
+                    android:layout_marginLeft="16dp"
+                    style="@style/ImageText"
+                    android:onClick="setFilter"
+                    android:id="@+id/filter4"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Filter 5"
+                    android:layout_marginLeft="16dp"
+                    style="@style/ImageText"
+                    android:onClick="setFilter"
+                    android:id="@+id/filter5"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Filter 6"
+                    android:layout_marginLeft="16dp"
+                    style="@style/ImageText"
+                    android:onClick="setFilter"
+                    android:id="@+id/filter6"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Filter 7"
+                    android:layout_marginLeft="16dp"
+                    style="@style/ImageText"
+                    android:onClick="setFilter"
+                    android:id="@+id/filter7"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Filter 8"
+                    android:layout_marginLeft="16dp"
+                    style="@style/ImageText"
+                    android:onClick="setFilter"
+                    android:id="@+id/filter8"
+                    />
+
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="None"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    style="@style/ImageText"
+                    android:id="@+id/none"
+                    android:onClick="setFilter"
+                    />
+
+
+
+
+            </LinearLayout>
+            </RelativeLayout>
+
+        </HorizontalScrollView>
+
+
+    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_alignParentBottom="true"
-        android:alpha="0.5"
         android:animateLayoutChanges="true"
-        android:background="#000">
+        android:background="#80000000">
+
+        <RelativeLayout
+            android:id="@+id/relativeLayout1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true">
+
+            <ImageButton
+                android:id="@+id/mic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:background="@null"
+                android:src="@drawable/vector_drawable_ic_mic_black___px" />
+
+            <ImageButton
+                android:id="@+id/info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_toLeftOf="@+id/hide"
+                android:background="@null"
+                android:src="@drawable/vector_drawable_ic_info_outline_white___px" />
+
+
+            <TextView
+                android:id="@+id/hide"
+                style="@style/ImageText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginLeft="16dp"
+                android:paddingRight="16dp"
+                android:paddingTop="16dp"
+                android:text="Hide" />
+        </RelativeLayout>
 
 
         <EditText
@@ -119,22 +318,17 @@
             style="@style/DescriptionText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/relativeLayout1"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:background="#00000000"
             android:hint="Add your description here"
             android:imeOptions="actionDone"
-            android:singleLine="true"
             android:textColorHint="#fff"
+            android:textCursorDrawable="@null"
 
             />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/ImageText"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:text="Done"
-            android:layout_margin="16dp"
-            />
 
     </RelativeLayout>
 

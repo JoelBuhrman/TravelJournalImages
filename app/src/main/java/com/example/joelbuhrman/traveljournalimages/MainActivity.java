@@ -32,7 +32,7 @@ import java.util.ArrayList;
 /**
  * Created by JoelBuhrman on 16-04-05.
  */
-public class MainActivity2 extends Activity implements View.OnClickListener {
+public class MainActivity extends Activity implements View.OnClickListener {
     private static int mode;
     private static final int FILTER_MODE = 0;
     private static final int REGULAR_MODE = 1;
@@ -49,7 +49,7 @@ public class MainActivity2 extends Activity implements View.OnClickListener {
 
 
     private ImageView filter;
-    int[] filters = {R.drawable.filtertest, R.drawable.filter2, R.drawable.filter3, R.drawable.filter4, R.drawable.filter5, R.drawable.filter6, R.drawable.filter7, R.drawable.filter8, R.drawable.filter9, R.drawable.filter10, R.drawable.filter12};
+    int[] filters = {R.drawable.filter1, R.drawable.filter2, R.drawable.filter3,R.drawable.filter4, R.drawable.filter5,R.drawable.filter8, R.drawable.filter9, R.drawable.filter11, R.drawable.filter12};
 
 
     private FloatingActionsMenu menuMultipleActions;
@@ -71,7 +71,7 @@ public class MainActivity2 extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.activity_main_alt2);
+        setContentView(R.layout.activity_main);
 
 
         init();
@@ -225,7 +225,7 @@ ställer in vilket mode vi befinner oss i
         /*
         Custom dialogerna
          */
-        cdcc = new CustomDialogCommandsClass(MainActivity2.this);
+        cdcc = new CustomDialogCommandsClass(MainActivity.this);
 
         /*
         Komponenterna i Descriptiondelen
@@ -275,7 +275,7 @@ ställer in vilket mode vi befinner oss i
             public void run() {
 
                 if (!isFinishing()) {
-                    new AlertDialog.Builder(MainActivity2.this)
+                    new AlertDialog.Builder(MainActivity.this)
                             .setTitle("Delete Image?")
                             .setMessage("Are you sure you want to delete this image?")
                             .setCancelable(false)
@@ -302,7 +302,7 @@ ställer in vilket mode vi befinner oss i
     }
 
     private void saveImageAction() {
-        startActivity(new Intent(getApplicationContext(), CameraActivity2.class));
+        startActivity(new Intent(getApplicationContext(), CameraActivity.class));
         Toast.makeText(getApplicationContext(), "Saved!", Toast.LENGTH_SHORT).show();
     }
 
@@ -528,15 +528,10 @@ ställer in vilket mode vi befinner oss i
             case R.id.filter8:
                 filter.setImageResource(filters[7]);
                 break;
-            case R.id.filter9:
-                filter.setImageResource(filters[8]);
-                break;
-            case R.id.filter10:
-                filter.setImageResource(filters[9]);
-                break;
-            case R.id.filter11:
-                filter.setImageResource(filters[10]);
-                break;
+
+
+
+
             case R.id.none:
                 filter.setImageResource(android.R.color.transparent);
                 break;
@@ -581,7 +576,7 @@ ställer in vilket mode vi befinner oss i
 
 
     public void startCamera() {
-        startActivity(new Intent(this, CameraActivity2.class));
+        startActivity(new Intent(this, CameraActivity.class));
     }
 
 

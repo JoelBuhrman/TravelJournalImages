@@ -40,7 +40,7 @@ import butterknife.InjectView;
 /**
  * Created by JoelBuhrman on 16-04-03.
  */
-public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.Callback {
+public class CameraActivity extends AppCompatActivity implements SurfaceHolder.Callback {
     private android.hardware.Camera camera;
     @InjectView(R.id.surfaceView)
     SurfaceView surfaceView;
@@ -67,7 +67,7 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.camera_dema_alt2);
+        setContentView(R.layout.custom_camera);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         ButterKnife.inject(this);
         init();
@@ -134,7 +134,7 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
 
 
         outputStream = null;
-        intent = new Intent(getApplicationContext(), MainActivity2.class);
+        intent = new Intent(getApplicationContext(), MainActivity.class);
         intent2 = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
 
         cityName = getCityName();
@@ -143,7 +143,7 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
         compass = new Compass(this, direction, "back");
         compass.start();
 
-        progressBar = (ProgressBar)findViewById(R.id.progressBar);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
         progressBar.setVisibility(View.GONE);
 
     }
@@ -275,7 +275,7 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
                     return;
                 }
 
-                photoFile = "Travel Journey%" + date + "%" + cityName +"%"+direction.getText() +"%.jpg";
+                photoFile = "Travel Journey%" + date + "%" + cityName + "%" + direction.getText() + "%.jpg";
                 file_name = file_image.getAbsolutePath() + "/" + photoFile;
                 picfile = new File(file_name);
 
@@ -325,12 +325,12 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            camera.setDisplayOrientation(90);
-            camera.startPreview();
+
             frontCamera = false;
         } else {
             camera.stopPreview();
             camera.release();
+
             camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
             try {
                 camera.setPreviewDisplay(surfaceHolder);
@@ -338,10 +338,12 @@ public class CameraActivity2 extends AppCompatActivity implements SurfaceHolder.
                 e.printStackTrace();
             }
 
-            camera.setDisplayOrientation(90);
-            camera.startPreview();
+
             frontCamera = true;
         }
+        camera.setDisplayOrientation(90);
+        camera.startPreview();
+
         compass.changeCam();
     }
 
